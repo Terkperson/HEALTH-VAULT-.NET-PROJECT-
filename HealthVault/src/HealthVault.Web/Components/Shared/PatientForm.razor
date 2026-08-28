@@ -1,0 +1,83 @@
+<EditForm Model="Model" OnValidSubmit="OnSave">
+    <DataAnnotationsValidator />
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">First name</label>
+            <InputText class="form-control" @bind-Value="Model.FirstName" />
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Last name</label>
+            <InputText class="form-control" @bind-Value="Model.LastName" />
+        </div>
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Date of birth</label>
+            <InputDate class="form-control" @bind-Value="Model.DateOfBirth" />
+        </div>
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Gender</label>
+            <InputSelect class="form-select" @bind-Value="Model.Gender">
+                <option value="1">Female</option>
+                <option value="2">Male</option>
+                <option value="3">Other</option>
+                <option value="4">Prefer not to say</option>
+            </InputSelect>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Blood group</label>
+            <InputSelect class="form-select" @bind-Value="Model.BloodGroup">
+                <option value="">Unknown</option>
+                <option value="1">A+</option><option value="2">A-</option>
+                <option value="3">B+</option><option value="4">B-</option>
+                <option value="5">AB+</option><option value="6">AB-</option>
+                <option value="7">O+</option><option value="8">O-</option>
+                <option value="9">Unknown</option>
+            </InputSelect>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Email</label>
+            <InputText class="form-control" @bind-Value="Model.Email" />
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Phone</label>
+            <InputText class="form-control" @bind-Value="Model.Phone" />
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Ghana Card</label>
+            <InputText class="form-control" @bind-Value="Model.GhanaCardNumber" />
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label">City</label>
+            <InputText class="form-control" @bind-Value="Model.City" />
+        </div>
+        <div class="col-md-8 mb-3">
+            <label class="form-label">Address</label>
+            <InputText class="form-control" @bind-Value="Model.AddressLine1" />
+        </div>
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Region</label>
+            <InputText class="form-control" @bind-Value="Model.Region" />
+        </div>
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Emergency contact</label>
+            <InputText class="form-control" @bind-Value="Model.EmergencyContactName" />
+        </div>
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Emergency phone</label>
+            <InputText class="form-control" @bind-Value="Model.EmergencyContactPhone" />
+        </div>
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Relation</label>
+            <InputText class="form-control" @bind-Value="Model.EmergencyContactRelation" />
+        </div>
+        <div class="col-12 mb-3">
+            <label class="form-label">Allergies</label>
+            <InputTextArea class="form-control" @bind-Value="Model.Allergies" />
+        </div>
+    </div>
+    <button class="btn btn-teal" type="submit">Save profile</button>
+</EditForm>
+
+@code {
+    [Parameter, EditorRequired] public UpsertPatientRequest Model { get; set; } = new();
+    [Parameter] public EventCallback OnSave { get; set; }
+}

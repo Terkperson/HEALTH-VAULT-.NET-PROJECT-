@@ -1,0 +1,43 @@
+@if (Items is null || Items.Count == 0)
+{
+    <p class="text-muted mb-0">No records uploaded yet.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>File</th>
+                    <th>Size</th>
+                    <th>Uploaded</th>
+                    @if (AllowDownload) { <th></th> }
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Items)
+            {
+                <tr>
+                    <td>@item.Title</td>
+                    <td>@item.CategoryName</td>
+                    <td>@item.OriginalFileName</td>
+                    <td>@item.FileSizeDisplay</td>
+                    <td>@item.UploadedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</td>
+                    @if (AllowDownload)
+                    {
+                        <td><button class="btn btn-sm btn-outline-secondary" @onclick="() => OnDownload.InvokeAsync(item)">Download</button></td>
+                    }
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    [Parameter] public IReadOnlyList<MedicalRecordDto>? Items { get; set; }
+    [Parameter] public EventCallback<MedicalRecordDto> OnDownload { get; set; }
+    [Parameter] public bool AllowDownload { get; set; }
+}

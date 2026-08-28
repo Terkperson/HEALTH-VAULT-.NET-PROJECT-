@@ -1,0 +1,127 @@
+@page "/appointments/book"
+@attribute [Authorize]
+@inject ApiClient Api
+@inject SessionState Session
+@inject NavigationManager Nav
+
+<h1 class="page-title">Book appointment</h1>
+<p class="lede">Clinic hours are 08:00–18:00. Slots are 30 minutes. Double-booking is blocked.</p>
+
+@if (!string.IsNullOrWhiteSpace(error))
+{
+    <div class="alert alert-danger">@error</div>
+}
+@if (!string.IsNullOrWhiteSpace(ok))
+{
+    <div class="alert alert-success">@ok</div>
+}
+
+<div class="card">
+    <EditForm Model="model" OnValidSubmit="Submit">
+        <DataAnnotationsValidator />
+        @if (Session.Role is UserRoles.Staff or UserRoles.Administrator)
+        {
+            <div class="mb-3">
+                <label class="form-label">Patient</label>
+                <InputSelect class="form-select" @bind-Value="selectedPatient">
+                    <option value="">Select patient…</option>
+                    @foreach (var p in patients)
+                    {
+                        <option value="@p.Id">@p.FullName — @p.Phone</option>
+                    }
+                </InputSelect>
+            </div>
+        }
+        <div class="mb-3">
+            <label class="form-label">Clinician</label>
+            <InputSelect class="form-select" @bind-Value="selectedStaff">
+                <option value="">Select clinician…</option>
+                @foreach (var s in staff)
+                {
+                    <option value="@s.Id">@s.FullName (@(s.Specialization ?? "General"))</option>
+                }
+            </InputSelect>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Date</label>
+                <InputDate class="form-control" @bind-Value="model.AppointmentDate" />
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Start</label>
+                <InputSelect class="form-select" @bind-Value="startText">
+                    @foreach (var slot in Slots)
+                    {
+                        <option value="@slot">@slot</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Reason</label>
+                <InputText class="form-control" @bind-Value="model.Reason" />
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Notes</label>
+            <InputTextArea class="form-control" @bind-Value="model.Notes" />
+        </div>
+        <button class="btn btn-teal" type="submit" disabled="@busy">Book</button>
+    </EditForm>
+</div>
+
+@code {
+    private static readonly string[] Slots =
+        Enumerable.Range(0, 20).Select(i => TimeOnly.FromTimeSpan(TimeSpan.FromHours(8) + TimeSpan.FromMinutes(i * 30)).ToString("HH:mm")).ToArray();
+
+    private readonly CreateAppointmentRequest model = new()
+    {
+        AppointmentDate = DateOnly.FromDateTime(DateTime.Today.AddDays(1)),
+        Reason = "Consultation"
+    };
+    private IReadOnlyList<StaffOptionDto> staff = [];
+    private IReadOnlyList<PatientDto> patients = [];
+    private string selectedStaff = "";
+    private string selectedPatient = "";
+    private string startText = "09:00";
+    private string? error;
+    private string? ok;
+    private bool busy;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var staffResult = await Api.ListStaffAsync();
+        if (staffResult.Success && staffResult.Data is not null) staff = staffResult.Data;
+
+        if (Session.Role is UserRoles.Staff or UserRoles.Administrator)
+        {
+            var search = await Api.SearchPatientsAsync(null);
+            if (search.Success && search.Data is not null) patients = search.Data.Items;
+        }
+        else if (Session.PatientId.HasValue)
+        {
+            model.PatientId = Session.PatientId.Value;
+        }
+    }
+
+    private async Task Submit()
+    {
+        busy = true;
+        error = ok = null;
+        if (Guid.TryParse(selectedStaff, out var staffId)) model.StaffId = staffId;
+        if (Guid.TryParse(selectedPatient, out var patientId)) model.PatientId = patientId;
+        if (TimeOnly.TryParse(startText, out var start)) model.StartTime = start;
+
+        if (model.PatientId == Guid.Empty && Session.PatientId.HasValue)
+            model.PatientId = Session.PatientId.Value;
+
+        var result = await Api.CreateAppointmentAsync(model);
+        busy = false;
+        if (!result.Success)
+        {
+            error = result.Message;
+            return;
+        }
+        ok = "Appointment booked.";
+        Nav.NavigateTo(Session.Role == UserRoles.Patient ? "/appointments" : "/staff/appointments");
+    }
+}

@@ -1,0 +1,66 @@
+@page "/profile"
+@attribute [Authorize(Roles = UserRoles.Patient)]
+@inject ApiClient Api
+
+<h1 class="page-title">My profile</h1>
+<p class="lede">Keep your contact and emergency details current.</p>
+
+@if (!string.IsNullOrWhiteSpace(message))
+{
+    <div class="alert alert-info">@message</div>
+}
+
+@if (form is not null)
+{
+    <div class="card">
+        <PatientForm Model="form" OnSave="Save" />
+    </div>
+}
+
+@code {
+    private UpsertPatientRequest? form;
+    private Guid id;
+    private string? message;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await Api.GetMyProfileAsync();
+        if (!result.Success || result.Data is null)
+        {
+            message = result.Message;
+            return;
+        }
+        id = result.Data.Id;
+        form = ToForm(result.Data);
+    }
+
+    private async Task Save()
+    {
+        if (form is null) return;
+        var result = await Api.UpdatePatientAsync(id, form);
+        message = result.Message;
+    }
+
+    private static UpsertPatientRequest ToForm(PatientDto p) => new()
+    {
+        FirstName = p.FirstName,
+        LastName = p.LastName,
+        DateOfBirth = p.DateOfBirth,
+        Gender = p.Gender,
+        Email = p.Email,
+        Phone = p.Phone,
+        GhanaCardNumber = p.GhanaCardNumber,
+        BloodGroup = p.BloodGroup,
+        AddressLine1 = p.AddressLine1,
+        AddressLine2 = p.AddressLine2,
+        City = p.City,
+        Region = p.Region,
+        PostalCode = p.PostalCode,
+        Country = p.Country,
+        EmergencyContactName = p.EmergencyContactName,
+        EmergencyContactPhone = p.EmergencyContactPhone,
+        EmergencyContactRelation = p.EmergencyContactRelation,
+        Allergies = p.Allergies,
+        Notes = p.Notes
+    };
+}

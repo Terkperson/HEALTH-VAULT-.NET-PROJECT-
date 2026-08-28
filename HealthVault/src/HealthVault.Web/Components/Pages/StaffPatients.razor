@@ -1,0 +1,68 @@
+@page "/staff/patients"
+@attribute [Authorize(Roles = $"{UserRoles.Staff},{UserRoles.Administrator}")]
+@inject ApiClient Api
+@inject NavigationManager Nav
+
+<h1 class="page-title">Patients</h1>
+<p class="lede">Search by name, email, phone or Ghana Card.</p>
+
+<div class="card">
+    <div class="row g-2">
+        <div class="col-md-8">
+            <input class="form-control" placeholder="Search patients…" @bind="query" @bind:event="oninput" />
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-teal w-100" @onclick="Search">Search</button>
+        </div>
+        <div class="col-md-2">
+            <a class="btn btn-outline-secondary w-100" href="/staff/patients/new">New patient</a>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    @if (results is null)
+    {
+        <p>Loading…</p>
+    }
+    else
+    {
+        <table class="table">
+            <thead><tr><th>Name</th><th>Age</th><th>Phone</th><th>Email</th><th>City</th><th></th></tr></thead>
+            <tbody>
+            @foreach (var p in results.Items)
+            {
+                <tr>
+                    <td>@p.FullName</td>
+                    <td>@p.Age</td>
+                    <td>@p.Phone</td>
+                    <td>@p.Email</td>
+                    <td>@p.City</td>
+                    <td>
+                        <a href="@EditUrl(p.Id)">Edit</a>
+                        ·
+                        <a href="@RecordUrl(p.Id)">Records</a>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        <p class="text-muted mb-0">@(results.TotalCount) patients</p>
+    }
+</div>
+
+@code {
+    private string? query;
+    private PagedResult<PatientDto>? results;
+
+    protected override Task OnInitializedAsync() => Search();
+
+    private async Task Search()
+    {
+        var result = await Api.SearchPatientsAsync(query);
+        if (result.Success) results = result.Data;
+    }
+
+    private static string EditUrl(Guid id) => $"/staff/patients/{id}";
+    private static string RecordUrl(Guid id) => $"/records/{id}";
+}

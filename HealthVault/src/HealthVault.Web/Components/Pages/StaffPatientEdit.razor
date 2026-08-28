@@ -1,0 +1,66 @@
+@page "/staff/patients/new"
+@page "/staff/patients/{Id:guid}"
+@attribute [Authorize(Roles = $"{UserRoles.Staff},{UserRoles.Administrator}")]
+@inject ApiClient Api
+@inject NavigationManager Nav
+
+<h1 class="page-title">@(Id == Guid.Empty ? "Register patient" : "Edit patient")</h1>
+<p class="lede">Staff-created patients do not need a portal login.</p>
+
+@if (!string.IsNullOrWhiteSpace(message))
+{
+    <div class="alert alert-info">@message</div>
+}
+
+<div class="card">
+    <PatientForm Model="form" OnSave="Save" />
+</div>
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+    private UpsertPatientRequest form = new() { DateOfBirth = new DateOnly(1990, 1, 1), Gender = 4, Country = "Ghana" };
+    private string? message;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id == Guid.Empty) return;
+        var result = await Api.GetPatientAsync(Id);
+        if (!result.Success || result.Data is null)
+        {
+            message = result.Message;
+            return;
+        }
+        var p = result.Data;
+        form = new UpsertPatientRequest
+        {
+            FirstName = p.FirstName,
+            LastName = p.LastName,
+            DateOfBirth = p.DateOfBirth,
+            Gender = p.Gender,
+            Email = p.Email,
+            Phone = p.Phone,
+            GhanaCardNumber = p.GhanaCardNumber,
+            BloodGroup = p.BloodGroup,
+            AddressLine1 = p.AddressLine1,
+            AddressLine2 = p.AddressLine2,
+            City = p.City,
+            Region = p.Region,
+            PostalCode = p.PostalCode,
+            Country = p.Country,
+            EmergencyContactName = p.EmergencyContactName,
+            EmergencyContactPhone = p.EmergencyContactPhone,
+            EmergencyContactRelation = p.EmergencyContactRelation,
+            Allergies = p.Allergies,
+            Notes = p.Notes
+        };
+    }
+
+    private async Task Save()
+    {
+        var result = Id == Guid.Empty
+            ? await Api.CreatePatientAsync(form)
+            : await Api.UpdatePatientAsync(Id, form);
+        message = result.Message;
+        if (result.Success) Nav.NavigateTo("/staff/patients");
+    }
+}

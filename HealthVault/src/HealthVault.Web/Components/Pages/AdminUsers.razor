@@ -1,0 +1,42 @@
+@page "/admin/users"
+@attribute [Authorize(Roles = UserRoles.Administrator)]
+@inject ApiClient Api
+
+<h1 class="page-title">Users and roles</h1>
+<p class="lede">View only for the MVP. To change a role, run <code>database/04_AssignRole.sql</code> in SSMS.</p>
+
+<div class="card">
+    @if (users is null)
+    {
+        <p>Loading…</p>
+    }
+    else
+    {
+        <table class="table">
+            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Active</th><th>Created</th></tr></thead>
+            <tbody>
+            @foreach (var u in users)
+            {
+                <tr>
+                    <td>@u.FullName</td>
+                    <td>@u.Email</td>
+                    <td>@u.Phone</td>
+                    <td>@u.Role</td>
+                    <td>@(u.IsActive ? "Yes" : "No")</td>
+                    <td>@u.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+</div>
+
+@code {
+    private IReadOnlyList<AdminUserDto>? users;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await Api.AdminUsersAsync();
+        if (result.Success) users = result.Data;
+    }
+}

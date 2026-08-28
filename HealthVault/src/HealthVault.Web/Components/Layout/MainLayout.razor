@@ -1,0 +1,92 @@
+@inherits LayoutComponentBase
+@implements IDisposable
+@inject SessionState Session
+@inject NavigationManager Nav
+
+<div class="hv-shell">
+    <aside class="hv-sidebar">
+        <div class="brand">
+            <div class="mark">HV</div>
+            <div>
+                <strong>HealthVault</strong>
+                <small>Clinic workspace</small>
+            </div>
+        </div>
+
+        <nav>
+            @if (!Session.IsAuthenticated)
+            {
+                <NavLink href="/" Match="NavLinkMatch.All">Home</NavLink>
+                <NavLink href="/login">Sign in</NavLink>
+                <NavLink href="/register">Register as patient</NavLink>
+            }
+            else
+            {
+                <NavLink href="/dashboard" Match="NavLinkMatch.All">Dashboard</NavLink>
+
+                @if (Session.Role == UserRoles.Patient)
+                {
+                    <NavLink href="/appointments">My appointments</NavLink>
+                    <NavLink href="/appointments/book">Book appointment</NavLink>
+                    <NavLink href="/records">Medical records</NavLink>
+                    <NavLink href="/profile">My profile</NavLink>
+                }
+
+                @if (Session.Role is UserRoles.Staff or UserRoles.Administrator)
+                {
+                    <NavLink href="/staff/patients">Patients</NavLink>
+                    <NavLink href="/staff/appointments">Appointments</NavLink>
+                }
+
+                @if (Session.Role == UserRoles.Administrator)
+                {
+                    <NavLink href="/admin/users">Users &amp; roles</NavLink>
+                }
+            }
+        </nav>
+
+        @if (Session.IsAuthenticated)
+        {
+            <div class="who">
+                <div class="who-name">@Session.FullName</div>
+                <div class="who-role">@Session.Role</div>
+                <button class="btn btn-ghost" @onclick="SignOut">Sign out</button>
+            </div>
+        }
+    </aside>
+
+    <main class="hv-main">
+        <header class="hv-top">
+            <div>
+                <div class="crumb">HealthVault MVP</div>
+                <div class="clock">@DateTime.Now.ToString("dddd, d MMMM yyyy")</div>
+            </div>
+        </header>
+        <section class="hv-content">
+            @Body
+        </section>
+    </main>
+</div>
+
+<div id="blazor-error-ui">
+    An unexpected error has occurred.
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        Session.Changed += OnSessionChanged;
+    }
+
+    private void OnSessionChanged() => InvokeAsync(StateHasChanged);
+
+    private void SignOut()
+    {
+        Session.Clear();
+        Nav.NavigateTo("/login", true);
+    }
+
+    public void Dispose() => Session.Changed -= OnSessionChanged;
+}

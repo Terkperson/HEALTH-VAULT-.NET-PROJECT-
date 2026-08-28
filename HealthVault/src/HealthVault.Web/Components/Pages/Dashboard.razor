@@ -1,0 +1,99 @@
+@page "/dashboard"
+@attribute [Authorize]
+@inject ApiClient Api
+@inject SessionState Session
+@inject NavigationManager Nav
+
+<h1 class="page-title">Dashboard</h1>
+<p class="lede">Welcome back, @Session.FullName.</p>
+
+@if (!string.IsNullOrWhiteSpace(error))
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+@if (patient is not null)
+{
+    <div class="stats">
+        <div class="stat"><span>Upcoming</span><strong>@patient.UpcomingAppointmentCount</strong></div>
+        <div class="stat"><span>Records</span><strong>@patient.RecordCount</strong></div>
+    </div>
+    <div class="card">
+        <h3>Upcoming appointments</h3>
+        <AppointmentTable Items="patient.UpcomingAppointments" />
+        <a class="btn btn-teal mt-2" href="/appointments/book">Book appointment</a>
+    </div>
+    <div class="card">
+        <h3>Recent records</h3>
+        <RecordTable Items="patient.RecentRecords" />
+    </div>
+}
+
+@if (staff is not null)
+{
+    <div class="stats">
+        <div class="stat"><span>Today</span><strong>@staff.TodayAppointmentCount</strong></div>
+        <div class="stat"><span>Pending</span><strong>@staff.PendingAppointmentCount</strong></div>
+        <div class="stat"><span>New patients (14d)</span><strong>@staff.RecentPatientCount</strong></div>
+    </div>
+    <div class="card">
+        <h3>Today's appointments</h3>
+        <AppointmentTable Items="staff.TodayAppointments" ShowPatient="true" />
+    </div>
+    <div class="card">
+        <h3>Pending queue</h3>
+        <AppointmentTable Items="staff.PendingAppointments" ShowPatient="true" />
+    </div>
+}
+
+@if (admin is not null)
+{
+    <div class="stats">
+        <div class="stat"><span>Users</span><strong>@admin.UserCount</strong></div>
+        <div class="stat"><span>Patients</span><strong>@admin.PatientCount</strong></div>
+        <div class="stat"><span>Staff</span><strong>@admin.StaffCount</strong></div>
+        <div class="stat"><span>Appointments</span><strong>@admin.AppointmentCount</strong></div>
+        <div class="stat"><span>Records</span><strong>@admin.MedicalRecordCount</strong></div>
+    </div>
+    <div class="card">
+        <h3>Appointment mix</h3>
+        <p>Pending @admin.PendingAppointments · Confirmed @admin.ConfirmedAppointments · Completed @admin.CompletedAppointments · Cancelled @admin.CancelledAppointments</p>
+        <a class="btn btn-teal" href="/admin/users">View users and roles</a>
+    </div>
+}
+
+@code {
+    private PatientDashboardDto? patient;
+    private StaffDashboardDto? staff;
+    private AdminDashboardDto? admin;
+    private string? error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Session.IsAuthenticated)
+        {
+            Nav.NavigateTo("/login");
+            return;
+        }
+
+        if (Session.Role == UserRoles.Patient)
+        {
+            var result = await Api.PatientDashboardAsync();
+            if (result.Success) patient = result.Data;
+            else error = result.Message;
+        }
+        else if (Session.Role is UserRoles.Staff or UserRoles.Administrator)
+        {
+            var result = await Api.StaffDashboardAsync();
+            if (result.Success) staff = result.Data;
+            else error = result.Message;
+        }
+
+        if (Session.Role == UserRoles.Administrator)
+        {
+            var result = await Api.AdminDashboardAsync();
+            if (result.Success) admin = result.Data;
+            else error = result.Message;
+        }
+    }
+}

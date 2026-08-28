@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{79A649A6-F38D-4671-8C71-6723FF07E1FE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HealthVault.Web", "src\HealthVault.Web\HealthVault.Web.csproj", "{C4EEFB10-8EF9-4FCE-BA11-8D575D90A3CC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HealthVault.Domain", "src\HealthVault.Domain\HealthVault.Domain.csproj", "{96E072B4-E08B-4562-AF1C-A55995E33D2A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HealthVault.Application", "src\HealthVault.Application\HealthVault.Application.csproj", "{64DE4A02-831C-47FF-B9C5-A630CD2498AF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HealthVault.Infrastructure", "src\HealthVault.Infrastructure\HealthVault.Infrastructure.csproj", "{96A92BE2-F309-4388-B8B4-8096046B87CD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HealthVault.Api", "src\HealthVault.Api\HealthVault.Api.csproj", "{F8A93670-5216-4FF8-B703-4DA785F8E145}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C4EEFB10-8EF9-4FCE-BA11-8D575D90A3CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4EEFB10-8EF9-4FCE-BA11-8D575D90A3CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4EEFB10-8EF9-4FCE-BA11-8D575D90A3CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4EEFB10-8EF9-4FCE-BA11-8D575D90A3CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96E072B4-E08B-4562-AF1C-A55995E33D2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96E072B4-E08B-4562-AF1C-A55995E33D2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96E072B4-E08B-4562-AF1C-A55995E33D2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96E072B4-E08B-4562-AF1C-A55995E33D2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64DE4A02-831C-47FF-B9C5-A630CD2498AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64DE4A02-831C-47FF-B9C5-A630CD2498AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64DE4A02-831C-47FF-B9C5-A630CD2498AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64DE4A02-831C-47FF-B9C5-A630CD2498AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96A92BE2-F309-4388-B8B4-8096046B87CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96A92BE2-F309-4388-B8B4-8096046B87CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96A92BE2-F309-4388-B8B4-8096046B87CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96A92BE2-F309-4388-B8B4-8096046B87CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8A93670-5216-4FF8-B703-4DA785F8E145}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8A93670-5216-4FF8-B703-4DA785F8E145}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8A93670-5216-4FF8-B703-4DA785F8E145}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8A93670-5216-4FF8-B703-4DA785F8E145}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C4EEFB10-8EF9-4FCE-BA11-8D575D90A3CC} = {79A649A6-F38D-4671-8C71-6723FF07E1FE}
+		{96E072B4-E08B-4562-AF1C-A55995E33D2A} = {79A649A6-F38D-4671-8C71-6723FF07E1FE}
+		{64DE4A02-831C-47FF-B9C5-A630CD2498AF} = {79A649A6-F38D-4671-8C71-6723FF07E1FE}
+		{96A92BE2-F309-4388-B8B4-8096046B87CD} = {79A649A6-F38D-4671-8C71-6723FF07E1FE}
+		{F8A93670-5216-4FF8-B703-4DA785F8E145} = {79A649A6-F38D-4671-8C71-6723FF07E1FE}
+	EndGlobalSection
+EndGlobal

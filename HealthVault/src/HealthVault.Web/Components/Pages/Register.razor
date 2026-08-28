@@ -1,0 +1,87 @@
+@page "/register"
+@inject ApiClient Api
+@inject SessionState Session
+@inject NavigationManager Nav
+
+<div class="auth-wrap card">
+    <h1 class="page-title">Patient registration</h1>
+    <p class="lede">Creates a login and a patient profile in one step.</p>
+
+    @if (!string.IsNullOrWhiteSpace(error))
+    {
+        <div class="alert alert-danger">@error</div>
+    }
+
+    <EditForm Model="model" OnValidSubmit="Submit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">First name</label>
+                <InputText class="form-control" @bind-Value="model.FirstName" />
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Last name</label>
+                <InputText class="form-control" @bind-Value="model.LastName" />
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <InputText class="form-control" @bind-Value="model.Email" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Phone</label>
+            <InputText class="form-control" @bind-Value="model.Phone" />
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Date of birth</label>
+                <InputDate class="form-control" @bind-Value="model.DateOfBirth" />
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Gender</label>
+                <InputSelect class="form-select" @bind-Value="model.Gender">
+                    <option value="1">Female</option>
+                    <option value="2">Male</option>
+                    <option value="3">Other</option>
+                    <option value="4">Prefer not to say</option>
+                </InputSelect>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Password</label>
+            <InputText type="password" class="form-control" @bind-Value="model.Password" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Confirm password</label>
+            <InputText type="password" class="form-control" @bind-Value="model.ConfirmPassword" />
+        </div>
+        <button class="btn btn-teal w-100" type="submit" disabled="@busy">@(busy ? "Creating…" : "Create account")</button>
+    </EditForm>
+</div>
+
+@code {
+    private readonly RegisterRequest model = new()
+    {
+        DateOfBirth = new DateOnly(2000, 1, 1),
+        Gender = 4
+    };
+    private string? error;
+    private bool busy;
+
+    private async Task Submit()
+    {
+        busy = true;
+        error = null;
+        var result = await Api.RegisterAsync(model);
+        busy = false;
+        if (!result.Success || result.Data is null)
+        {
+            error = string.Join(" ", result.Errors);
+            if (string.IsNullOrWhiteSpace(error)) error = result.Message;
+            return;
+        }
+        Session.Set(result.Data);
+        Nav.NavigateTo("/dashboard");
+    }
+}

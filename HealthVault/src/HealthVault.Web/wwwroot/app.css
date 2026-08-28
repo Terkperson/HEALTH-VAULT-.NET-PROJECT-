@@ -1,0 +1,151 @@
+:root {
+    --teal: #0d6e6e;
+    --teal-d: #094f4f;
+    --navy: #14324f;
+    --paper: #f3f6f5;
+    --line: #d7e3df;
+    --ink: #163042;
+    --muted: #5d7180;
+    --ok: #0f766e;
+    --warn: #b45309;
+    --bad: #be123c;
+    --info: #1d4ed8;
+}
+
+html, body {
+    font-family: "Segoe UI", Cambria, Georgia, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    margin: 0;
+}
+
+a { color: var(--teal); }
+
+.hv-shell {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: 100vh;
+}
+
+.hv-sidebar {
+    background: linear-gradient(180deg, #083b3b 0%, #0d6e6e 70%, #14324f 100%);
+    color: #fff;
+    padding: 22px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.brand { display: flex; gap: 12px; align-items: center; }
+.brand .mark {
+    width: 42px; height: 42px; border-radius: 12px;
+    background: #fff; color: var(--teal-d);
+    display: grid; place-items: center; font-weight: 800;
+}
+.brand small { display: block; opacity: .75; font-size: 12px; }
+
+.hv-sidebar nav { display: flex; flex-direction: column; gap: 4px; }
+.hv-sidebar nav a {
+    color: #e8f4f2;
+    text-decoration: none;
+    padding: 10px 12px;
+    border-radius: 10px;
+}
+.hv-sidebar nav a.active, .hv-sidebar nav a:hover {
+    background: rgba(255,255,255,.14);
+}
+
+.who { margin-top: auto; background: rgba(0,0,0,.18); border-radius: 12px; padding: 12px; }
+.who-name { font-weight: 650; }
+.who-role { font-size: 12px; opacity: .8; margin-bottom: 8px; }
+
+.hv-main { display: flex; flex-direction: column; min-width: 0; }
+.hv-top {
+    background: #fff;
+    border-bottom: 1px solid var(--line);
+    padding: 16px 28px;
+}
+.crumb { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.clock { font-weight: 650; }
+.hv-content { padding: 24px 28px 48px; }
+
+.page-title { margin: 0 0 6px; font-size: 28px; }
+.lede { color: var(--muted); margin: 0 0 22px; }
+
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 22px; }
+.stat {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 16px;
+}
+.stat span { display: block; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+.stat strong { font-size: 28px; color: var(--teal-d); }
+
+.card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 16px;
+}
+
+.table { width: 100%; }
+.table th { color: var(--teal-d); font-size: 12px; letter-spacing: .04em; }
+
+.badge-status {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 650;
+}
+.s-1 { background: #fff7ed; color: #c2410c; }
+.s-2 { background: #ecfeff; color: #0e7490; }
+.s-3 { background: #ecfdf5; color: #047857; }
+.s-4 { background: #fff1f2; color: #be123c; }
+
+.btn-teal {
+    background: var(--teal);
+    border-color: var(--teal);
+    color: #fff;
+}
+.btn-teal:hover { background: var(--teal-d); color: #fff; }
+.btn-ghost {
+    background: transparent;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,.35);
+    width: 100%;
+}
+
+.auth-wrap {
+    max-width: 520px;
+    margin: 20px auto;
+}
+.empty-state { text-align: center; padding: 48px 16px; }
+
+.hero {
+    background: linear-gradient(135deg, #083b3b, #1a365d);
+    color: #fff;
+    border-radius: 18px;
+    padding: 36px;
+    margin-bottom: 20px;
+}
+.hero h1 { margin: 0 0 8px; }
+
+.form-label { font-weight: 600; font-size: 13px; }
+.alert { border-radius: 10px; }
+
+#blazor-error-ui {
+    background: #fff1f2;
+    bottom: 0; box-shadow: 0 -1px 2px rgba(0,0,0,.2);
+    display: none; left: 0; padding: .6rem 1.25rem; position: fixed;
+    width: 100%; z-index: 1000;
+}
+#blazor-error-ui .dismiss { cursor: pointer; position: absolute; right: .75rem; top: .5rem; }
+
+@media (max-width: 860px) {
+    .hv-shell { grid-template-columns: 1fr; }
+    .hv-sidebar { flex-direction: row; flex-wrap: wrap; }
+    .who { margin-top: 0; width: 100%; }
+}

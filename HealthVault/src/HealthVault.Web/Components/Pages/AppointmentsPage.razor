@@ -1,0 +1,66 @@
+@page "/appointments"
+@attribute [Authorize(Roles = UserRoles.Patient)]
+@inject ApiClient Api
+@inject SessionState Session
+
+<h1 class="page-title">My appointments</h1>
+<p class="lede">Request, track and cancel visits.</p>
+
+@if (!string.IsNullOrWhiteSpace(message))
+{
+    <div class="alert alert-info">@message</div>
+}
+
+<div class="card">
+    <AppointmentTable Items="items" />
+</div>
+
+@if (items.Any(a => a.Status is 1 or 2))
+{
+    <div class="card">
+        <h3>Cancel an appointment</h3>
+        <div class="row g-2">
+            <div class="col-md-5">
+                <InputSelect class="form-select" @bind-Value="cancelId">
+                    <option value="">Select…</option>
+                    @foreach (var item in items.Where(a => a.Status is 1 or 2))
+                    {
+                        <option value="@item.Id">@item.AppointmentDate @item.StartTime — @item.StaffName</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="col-md-5">
+                <input class="form-control" placeholder="Reason" @bind="cancelReason" />
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-outline-danger w-100" @onclick="Cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private IReadOnlyList<AppointmentDto> items = [];
+    private string? message;
+    private string cancelId = "";
+    private string cancelReason = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await Api.ListAppointmentsAsync();
+        if (result.Success && result.Data is not null) items = result.Data;
+        else message = result.Message;
+    }
+
+    private async Task Cancel()
+    {
+        if (!Guid.TryParse(cancelId, out var id) || string.IsNullOrWhiteSpace(cancelReason))
+        {
+            message = "Choose an appointment and give a reason.";
+            return;
+        }
+        var result = await Api.CancelAppointmentAsync(id, cancelReason);
+        message = result.Message;
+        await OnInitializedAsync();
+    }
+}

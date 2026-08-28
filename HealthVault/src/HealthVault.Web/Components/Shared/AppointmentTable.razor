@@ -1,0 +1,39 @@
+@if (Items is null || Items.Count == 0)
+{
+    <p class="text-muted mb-0">Nothing to show yet.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    @if (ShowPatient) { <th>Patient</th> }
+                    <th>Clinician</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Items)
+            {
+                <tr>
+                    <td>@item.AppointmentDate.ToString("dd MMM yyyy")</td>
+                    <td>@item.StartTime.ToString("HH:mm")–@item.EndTime.ToString("HH:mm")</td>
+                    @if (ShowPatient) { <td>@item.PatientName</td> }
+                    <td>@item.StaffName</td>
+                    <td>@item.Reason</td>
+                    <td><span class="badge-status s-@item.Status">@item.StatusName</span></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    [Parameter] public IReadOnlyList<AppointmentDto>? Items { get; set; }
+    [Parameter] public bool ShowPatient { get; set; }
+}

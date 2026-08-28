@@ -1,0 +1,30 @@
+@page "/"
+
+<div class="hero">
+    <div class="crumb" style="color:#cde8e4">Two-week MVP · .NET 8</div>
+    <h1>Care records, appointments and clinic staff — in one vault.</h1>
+    <p>Patients register, book and view records. Staff manage the floor. Administrators see the numbers. Built to the HealthVault SRS v1.1.</p>
+    <a class="btn btn-light me-2" href="/login">Sign in</a>
+    <a class="btn btn-outline-light" href="/register">Create a patient account</a>
+</div>
+
+<div class="stats">
+    <div class="stat"><span>Auth</span><strong>JWT + roles</strong></div>
+    <div class="stat"><span>Patients</span><strong>CRUD + search</strong></div>
+    <div class="stat"><span>Appointments</span><strong>Status + slots</strong></div>
+    <div class="stat"><span>Records</span><strong>Upload / view</strong></div>
+</div>
+
+<div class="card">
+    <h3>Demo accounts (after first API start)</h3>
+    <table class="table">
+        <thead><tr><th>Role</th><th>Email</th><th>Password</th></tr></thead>
+        <tbody>
+            <tr><td>Administrator</td><td>admin@healthvault.com</td><td>Admin@12345</td></tr>
+            <tr><td>Staff</td><td>staff@healthvault.com</td><td>Staff@12345</td></tr>
+            <tr><td>Staff (nurse)</td><td>nurse@healthvault.com</td><td>Staff@12345</td></tr>
+            <tr><td>Patient</td><td>patient@healthvault.com</td><td>Patient@12345</td></tr>
+        </tbody>
+    </table>
+    <p class="mb-0 text-muted">Point the API at your SQL Server, run the scripts in <code>database/</code>, then start HealthVault.Api and HealthVault.Web.</p>
+</div>

@@ -1,0 +1,93 @@
+@page "/records"
+@page "/records/{PatientId:guid}"
+@attribute [Authorize]
+@inject ApiClient Api
+@inject SessionState Session
+@inject IJSRuntime Js
+
+<h1 class="page-title">Medical records</h1>
+<p class="lede">PDF, JPG, PNG or DOCX up to 10 MB. Category is fixed to General for the MVP.</p>
+
+@if (!string.IsNullOrWhiteSpace(message))
+{
+    <div class="alert alert-info">@message</div>
+}
+
+<div class="card">
+    <h3>Upload</h3>
+    <div class="row g-2">
+        <div class="col-md-4">
+            <input class="form-control" placeholder="Title" @bind="title" />
+        </div>
+        <div class="col-md-4">
+            <input class="form-control" placeholder="Description (optional)" @bind="description" />
+        </div>
+        <div class="col-md-3">
+            <InputFile class="form-control" OnChange="OnFile" accept=".pdf,.jpg,.jpeg,.png,.docx" />
+        </div>
+        <div class="col-md-1">
+            <button class="btn btn-teal w-100" @onclick="Upload" disabled="@(file is null || busy)">Go</button>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <RecordTable Items="items" OnDownload="Download" AllowDownload="true" />
+</div>
+
+@code {
+    [Parameter] public Guid PatientId { get; set; }
+
+    private IReadOnlyList<MedicalRecordDto> items = [];
+    private IBrowserFile? file;
+    private string title = "Clinical document";
+    private string? description;
+    private string? message;
+    private bool busy;
+    private Guid resolvedPatient;
+
+    protected override async Task OnInitializedAsync()
+    {
+        resolvedPatient = PatientId != Guid.Empty ? PatientId : Session.PatientId ?? Guid.Empty;
+        if (resolvedPatient == Guid.Empty)
+        {
+            message = "No patient is selected.";
+            return;
+        }
+        await Reload();
+    }
+
+    private async Task Reload()
+    {
+        var result = await Api.ListRecordsAsync(resolvedPatient);
+        if (result.Success && result.Data is not null) items = result.Data;
+        else message = result.Message;
+    }
+
+    private void OnFile(InputFileChangeEventArgs e) => file = e.File;
+
+    private async Task Upload()
+    {
+        if (file is null) return;
+        busy = true;
+        var result = await Api.UploadRecordAsync(resolvedPatient, title, description, file);
+        busy = false;
+        message = result.Message;
+        file = null;
+        await Reload();
+    }
+
+    private async Task Download(MedicalRecordDto record)
+    {
+        var (bytes, name, type, error) = await Api.DownloadRecordAsync(record.Id, record.OriginalFileName);
+        if (bytes is null)
+        {
+            message = error;
+            return;
+        }
+        var b64 = Convert.ToBase64String(bytes);
+        var safeName = name.Replace("'", string.Empty);
+        var script = "(() => { const a=document.createElement('a'); a.href='data:" + type + ";base64," + b64 + "'; a.download='" + safeName + "'; a.click(); })()";
+        await Js.InvokeVoidAsync("eval", script);
+    }
+}
