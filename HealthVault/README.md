@@ -76,6 +76,29 @@ dotnet run --project src/HealthVault.Web
 
 If the Web app is on another host, set `ApiBaseUrl` in `src/HealthVault.Web/appsettings.json`.
 
+## 4. Deploy the API and Web app
+
+This is a separate frontend and backend project, so submit one GitHub link and one deployment link for each app.
+
+Deploy `src/HealthVault.Api` and `src/HealthVault.Web` as two .NET 8 web services. The hosting platform must provide a reachable SQL Server database. Run the four scripts in `database/` against that database before opening the API URL; the API then creates the demo Identity accounts on first start.
+
+Set these environment variables on the API service:
+
+```
+ConnectionStrings__DefaultConnection=<SQL Server connection string>
+Jwt__Key=<long random production secret>
+Jwt__Issuer=HealthVault
+Jwt__Audience=HealthVault.Clients
+```
+
+Set this environment variable on the Web service, using the public API URL and a trailing slash:
+
+```
+ApiBaseUrl=https://<your-api-domain>/
+```
+
+The apps use the hosting platform's `PORT` variable when it is supplied, and keep ports 5080 and 5081 for local development. Do not commit production connection strings, JWT keys, or real patient data.
+
 ## Demo accounts
 
 Created on first successful API start.
