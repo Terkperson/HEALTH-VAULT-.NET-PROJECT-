@@ -1,0 +1,8 @@
+.git
+.vs
+.idea
+**/bin
+**/obj
+App_Data
+*.user
+*.suo

@@ -80,7 +80,9 @@ If the Web app is on another host, set `ApiBaseUrl` in `src/HealthVault.Web/apps
 
 This is a separate frontend and backend project, so submit one GitHub link and one deployment link for each app.
 
-Deploy `src/HealthVault.Api` and `src/HealthVault.Web` as two .NET 8 web services. The hosting platform must provide a reachable SQL Server database. Run the four scripts in `database/` against that database before opening the API URL; the API then creates the demo Identity accounts on first start.
+For Render, create two Docker web services from the repository root. Leave **Root Directory** empty, set the API service Dockerfile path to `Dockerfile.api`, and set the Web service Dockerfile path to `Dockerfile.web`. The Dockerfiles build the .NET 8 projects from the repository root.
+
+The hosting platform must provide a reachable SQL Server database. Run the database scripts against that database before opening the API URL; the API then creates the demo Identity accounts on first start.
 
 Set these environment variables on the API service:
 
