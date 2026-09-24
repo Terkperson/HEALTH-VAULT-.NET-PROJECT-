@@ -1,0 +1,60 @@
+📸 ADD YOUR HEALTHCARE IMAGE HERE
+===================================
+
+INSTRUCTIONS:
+-------------
+
+1. Save the doctor/medical hexagon image you showed me
+
+2. Rename it to: healthcare-hero.jpg
+   (or healthcare-hero.png if it's a PNG)
+
+3. Place it in this folder:
+   HealthVault/src/HealthVault.Web/wwwroot/images/
+
+4. Restart the application (or just refresh browser)
+
+5. The image will appear as the background of the hero section!
+
+
+CURRENT FILE LOCATION:
+---------------------
+You are currently in:
+📁 HealthVault/src/HealthVault.Web/wwwroot/images/
+
+Just copy your image file here and name it "healthcare-hero.jpg"
+
+
+EXPECTED RESULT:
+---------------
+The hero section on the home page will show:
+- Your medical image in the background
+- Text overlay on top (readable with dark teal overlay)
+- Buttons visible and clickable
+- Professional healthcare theme
+
+
+IMAGE SPECS:
+-----------
+✅ Name: healthcare-hero.jpg (or .png)
+✅ Recommended size: 1920x600 pixels
+✅ File size: Under 1MB
+✅ Format: JPG or PNG
+
+
+TROUBLESHOOTING:
+---------------
+If image doesn't show:
+1. Check the filename is EXACTLY: healthcare-hero.jpg
+2. Make sure it's in the /images/ folder
+3. Hard refresh browser: Ctrl + Shift + R
+4. Check browser console for errors
+5. Restart the application
+
+If text is hard to read:
+- The overlay is already configured to darken the image
+- Text should be clearly visible with white color
+
+
+✨ READY TO GO!
+Just add your image file here and refresh!

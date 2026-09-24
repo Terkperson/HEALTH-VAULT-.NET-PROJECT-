@@ -3,18 +3,10 @@
 @inject ApiClient Api
 @inject SessionState Session
 @inject NavigationManager Nav
+@inject ToastService Toast
 
 <h1 class="page-title">Book appointment</h1>
 <p class="lede">Clinic hours are 08:00–18:00. Slots are 30 minutes. Double-booking is blocked.</p>
-
-@if (!string.IsNullOrWhiteSpace(error))
-{
-    <div class="alert alert-danger">@error</div>
-}
-@if (!string.IsNullOrWhiteSpace(ok))
-{
-    <div class="alert alert-success">@ok</div>
-}
 
 <div class="card">
     <EditForm Model="model" OnValidSubmit="Submit">
@@ -65,7 +57,9 @@
             <label class="form-label">Notes</label>
             <InputTextArea class="form-control" @bind-Value="model.Notes" />
         </div>
-        <button class="btn btn-teal" type="submit" disabled="@busy">Book</button>
+        <button class="btn btn-teal" type="submit" disabled="@busy">
+            @(busy ? "Booking..." : "Book")
+        </button>
     </EditForm>
 </div>
 
@@ -83,8 +77,6 @@
     private string selectedStaff = "";
     private string selectedPatient = "";
     private string startText = "09:00";
-    private string? error;
-    private string? ok;
     private bool busy;
 
     protected override async Task OnInitializedAsync()
@@ -106,7 +98,6 @@
     private async Task Submit()
     {
         busy = true;
-        error = ok = null;
         if (Guid.TryParse(selectedStaff, out var staffId)) model.StaffId = staffId;
         if (Guid.TryParse(selectedPatient, out var patientId)) model.PatientId = patientId;
         if (TimeOnly.TryParse(startText, out var start)) model.StartTime = start;
@@ -118,10 +109,10 @@
         busy = false;
         if (!result.Success)
         {
-            error = result.Message;
+            Toast.ShowError(result.Message ?? "Failed to book appointment", "Booking Failed");
             return;
         }
-        ok = "Appointment booked.";
+        Toast.ShowSuccess($"Appointment booked for {model.AppointmentDate:MMM dd} at {startText}", "Appointment Booked");
         Nav.NavigateTo(Session.Role == UserRoles.Patient ? "/appointments" : "/staff/appointments");
     }
 }

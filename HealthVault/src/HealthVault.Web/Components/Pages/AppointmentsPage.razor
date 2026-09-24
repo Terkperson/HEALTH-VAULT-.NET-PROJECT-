@@ -2,14 +2,10 @@
 @attribute [Authorize(Roles = UserRoles.Patient)]
 @inject ApiClient Api
 @inject SessionState Session
+@inject ToastService Toast
 
 <h1 class="page-title">My appointments</h1>
 <p class="lede">Request, track and cancel visits.</p>
-
-@if (!string.IsNullOrWhiteSpace(message))
-{
-    <div class="alert alert-info">@message</div>
-}
 
 <div class="card">
     <AppointmentTable Items="items" />
@@ -41,26 +37,40 @@
 
 @code {
     private IReadOnlyList<AppointmentDto> items = [];
-    private string? message;
     private string cancelId = "";
     private string cancelReason = "";
 
     protected override async Task OnInitializedAsync()
     {
         var result = await Api.ListAppointmentsAsync();
-        if (result.Success && result.Data is not null) items = result.Data;
-        else message = result.Message;
+        if (result.Success && result.Data is not null) 
+        {
+            items = result.Data;
+        }
+        else 
+        {
+            Toast.ShowError(result.Message ?? "Failed to load appointments", "Error");
+        }
     }
 
     private async Task Cancel()
     {
         if (!Guid.TryParse(cancelId, out var id) || string.IsNullOrWhiteSpace(cancelReason))
         {
-            message = "Choose an appointment and give a reason.";
+            Toast.ShowWarning("Please select an appointment and provide a cancellation reason", "Incomplete");
             return;
         }
         var result = await Api.CancelAppointmentAsync(id, cancelReason);
-        message = result.Message;
-        await OnInitializedAsync();
+        if (result.Success)
+        {
+            Toast.ShowSuccess("Your appointment has been cancelled", "Appointment Cancelled");
+            cancelId = "";
+            cancelReason = "";
+            await OnInitializedAsync();
+        }
+        else
+        {
+            Toast.ShowError(result.Message ?? "Failed to cancel appointment", "Error");
+        }
     }
 }

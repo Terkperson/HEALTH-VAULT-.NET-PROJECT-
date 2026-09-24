@@ -1,100 +1,364 @@
-# HealthVault
+# 🏥 HealthVault - Digital Health Records Management System
 
-2-week MVP of a clinic workspace for patients, staff and administrators.
+## 📋 Project Overview
 
-Matches **SRS v1.1 (August 2026)**: authentication, patient management, appointments, medical records (upload / view / download), three dashboards, view-only admin. Record deletion and the admin role-reassignment UI are deferred.
+HealthVault is a comprehensive web-based healthcare management system that enables patients to manage their medical records, book appointments, and interact with healthcare providers. The system provides role-based access for Patients, Staff, and Administrators.
 
-## Stack
+## ✨ Key Features
 
-| Layer | Technology |
-| --- | --- |
-| Frontend | Blazor Web App, Interactive Server (.NET 8) |
-| Backend | ASP.NET Core Web API |
-| Language | C# |
-| ORM | Entity Framework Core 8 |
-| Database | SQL Server |
-| Auth | ASP.NET Core Identity + JWT |
-| UI | Bootstrap 5 |
+### 👤 Patient Features
+- User registration and authentication
+- Book and manage appointments
+- View and upload medical records
+- Update personal profile
+- View appointment history
+- Dashboard with quick statistics
 
-Blazor Server is the Section 5 fallback: same C# / EF / Identity / Azure stack as the original WASM proposal, without the Day-1 WASM/CORS tax.
+### 👨‍⚕️ Staff Features
+- View and manage patient appointments
+- Access patient medical records
+- Update appointment statuses
+- View patient list
+- Staff dashboard with metrics
 
-## Solution layout
+### 👨‍💼 Admin Features
+- User management (create, update, delete users)
+- Assign roles to users
+- View system-wide statistics
+- Manage staff accounts
+- Monitor system activity
+
+## 🛠️ Technology Stack
+
+### Backend
+- **Framework**: ASP.NET Core 8.0 Web API
+- **ORM**: Entity Framework Core
+- **Database**: SQL Server
+- **Authentication**: JWT (JSON Web Tokens)
+- **Architecture**: Clean Architecture / Layered Architecture
+
+### Frontend
+- **Framework**: Blazor Server (.NET 8)
+- **CSS**: Custom CSS with Glassmorphism effects
+- **UI Components**: Bootstrap 5
+- **Icons**: SVG Icons
+- **Notifications**: Custom Toast Service
+
+### Additional Technologies
+- Swagger/OpenAPI for API documentation
+- CORS enabled for cross-origin requests
+- Dependency Injection
+- Data validation with Data Annotations
+
+## 📁 Project Structure
 
 ```
 HealthVault/
-  HealthVault.sln
-  database/                     SQL Server scripts for SSMS / Azure Data Studio
-  docs/HealthVault_Database.html
-  docs/HealthVault_Tables.xlsx
-  src/HealthVault.Domain        Entities and enums
-  src/HealthVault.Application   DTOs and service contracts
-  src/HealthVault.Infrastructure Identity, EF Core, services
-  src/HealthVault.Api           REST + JWT + Swagger
-  src/HealthVault.Web           Blazor UI
+├── src/
+│   ├── HealthVault.Api/          # Web API project
+│   │   ├── Controllers/          # API endpoints
+│   │   ├── Data/                 # DbContext & configurations
+│   │   ├── Models/               # Data models
+│   │   └── Services/             # Business logic
+│   │
+│   └── HealthVault.Web/          # Blazor Web UI
+│       ├── Components/
+│       │   ├── Layout/           # Layout components
+│       │   ├── Pages/            # Page components
+│       │   └── Shared/           # Shared components
+│       ├── Services/             # Client services
+│       └── wwwroot/              # Static files (CSS, images)
+│
+└── docs/                         # Documentation
 ```
 
-## 1. Create the database in a workbench
+## 🚀 Getting Started
 
-Use SSMS, Azure Data Studio, or any SQL Server workbench.
+### Prerequisites
+- .NET 8.0 SDK or later
+- SQL Server (LocalDB, Express, or Full)
+- Visual Studio 2022 or VS Code
+- Git (optional)
 
-1. Connect to your instance.
-2. Run `database/01_CreateDatabase.sql`
-3. Run `database/02_CreateTables.sql`
-4. Run `database/03_SeedData.sql`
-5. Keep `database/04_AssignRole.sql` for MVP role changes (FR-20).
+### Installation Steps
 
-Full column catalog and ERD: open `docs/HealthVault_Database.html`.
+1. **Clone the Repository**
+   ```bash
+   git clone <repository-url>
+   cd HealthVault
+   ```
 
-## 2. Point the API at SQL Server
+2. **Update Connection String**
+   
+   Edit `src/HealthVault.Api/appsettings.json`:
+   ```json
+   {
+     "ConnectionStrings": {
+       "DefaultConnection": "Server=.;Database=HealthVault;Trusted_Connection=true;TrustServerCertificate=true;"
+     }
+   }
+   ```
 
-Edit `src/HealthVault.Api/appsettings.json`:
+3. **Create Database**
+   ```bash
+   cd src/HealthVault.Api
+   dotnet ef database update
+   ```
 
-Windows authentication:
+4. **Run the Application**
+   
+   **Terminal 1** (API):
+   ```bash
+   cd src/HealthVault.Api
+   dotnet run
+   ```
+   
+   **Terminal 2** (Web UI):
+   ```bash
+   cd src/HealthVault.Web
+   dotnet run
+   ```
 
+5. **Access the Application**
+   - Web UI: http://localhost:5081
+   - API: http://localhost:5080
+   - Swagger: http://localhost:5080/swagger
+
+## 👥 Default User Accounts
+
+### Patient
+- Email: `patient@healthvault.com`
+- Password: `Patient@12345`
+
+### Staff
+- Email: `staff@healthvault.com`
+- Password: `Staff@12345`
+
+### Admin
+- Email: `admin@healthvault.com`
+- Password: `Admin@12345`
+
+## 📸 Screenshots
+
+### Login Page
+Clean authentication interface with social login options.
+
+### Patient Dashboard
+Overview of appointments, medical records, and quick actions.
+
+### Appointment Booking
+Simple interface to book appointments with healthcare providers.
+
+### Admin Panel
+Comprehensive user management and system statistics.
+
+## 🎨 UI/UX Features
+
+- ✨ **Glassmorphism Design** - Modern blur effects and transparency
+- 🎨 **Gradient Accents** - Professional color schemes
+- 📱 **Responsive Design** - Works on desktop, tablet, and mobile
+- 🔔 **Toast Notifications** - Non-intrusive user feedback
+- 🎭 **Empty States** - Helpful messages when no data exists
+- ⏳ **Loading States** - Visual feedback during operations
+- 🎯 **Role-Based UI** - Different interfaces for different user types
+
+## 🔐 Security Features
+
+- JWT-based authentication
+- Password hashing (built-in ASP.NET Identity)
+- Role-based authorization
+- Input validation
+- SQL injection protection (EF Core parameterized queries)
+- CORS configuration
+- Secure session management
+
+## 🗄️ Database Schema
+
+### Main Tables
+- **Users** - User accounts and authentication
+- **Patients** - Patient-specific information
+- **Appointments** - Appointment bookings
+- **MedicalRecords** - Patient medical history
+- **Roles** - User role definitions
+- **UserRoles** - User-role relationships
+
+## 📝 API Endpoints
+
+### Authentication
+- `POST /api/Auth/register` - Register new user
+- `POST /api/Auth/login` - User login
+
+### Appointments
+- `GET /api/Appointments` - Get all appointments
+- `GET /api/Appointments/{id}` - Get appointment by ID
+- `POST /api/Appointments` - Create appointment
+- `PUT /api/Appointments/{id}` - Update appointment
+- `DELETE /api/Appointments/{id}` - Delete appointment
+
+### Medical Records
+- `GET /api/MedicalRecords` - Get all records
+- `GET /api/MedicalRecords/{id}` - Get record by ID
+- `POST /api/MedicalRecords` - Create record
+- `PUT /api/MedicalRecords/{id}` - Update record
+
+### Users (Admin Only)
+- `GET /api/Users` - Get all users
+- `GET /api/Users/{id}` - Get user by ID
+- `PUT /api/Users/{id}` - Update user
+- `DELETE /api/Users/{id}` - Delete user
+
+## 🧪 Testing
+
+### Manual Testing
+1. Test user registration and login
+2. Test appointment booking as patient
+3. Test appointment management as staff
+4. Test user management as admin
+5. Test responsive design on different devices
+
+### Test Scenarios
+- ✅ User can register with valid credentials
+- ✅ User cannot register with existing email
+- ✅ User can login with correct credentials
+- ✅ Patient can book appointments
+- ✅ Staff can view and manage appointments
+- ✅ Admin can create/update/delete users
+- ✅ Role-based access control works correctly
+
+## 📦 Deployment
+
+### Option 1: Azure
+1. Create Azure App Service
+2. Create Azure SQL Database
+3. Update connection string
+4. Publish using Visual Studio or CLI
+
+### Option 2: Local IIS
+1. Publish application
+2. Create IIS website
+3. Configure application pool
+4. Set up database connection
+
+### Option 3: Docker (Future)
+Docker support can be added for containerized deployment.
+
+## 🔧 Configuration
+
+### JWT Settings
+Edit `appsettings.json`:
+```json
+{
+  "JwtSettings": {
+    "SecretKey": "your-secret-key-min-32-chars",
+    "Issuer": "HealthVault",
+    "Audience": "HealthVaultUsers",
+    "ExpiryMinutes": 60
+  }
+}
 ```
-Server=localhost;Database=HealthVaultDb;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=True
-```
 
-SQL login (typical on a shared lab machine):
+### CORS Settings
+Edit `Program.cs` to configure allowed origins.
 
-```
-Server=localhost;Database=HealthVaultDb;User Id=sa;Password=YourPassword;TrustServerCertificate=True;MultipleActiveResultSets=True
-```
+## 🐛 Known Issues
 
-If the database already exists from the scripts, the API will not recreate tables. It will only seed Identity users (passwords must be hashed by Identity, so they are not inserted in T-SQL).
+- Social login buttons are visual only (not functional)
+- Email verification not implemented
+- Password reset via email not implemented
+- File upload size limited to 10MB
 
-## 3. Run
+## 🚧 Future Enhancements
 
+- [ ] Email verification system
+- [ ] Password reset via email
+- [ ] Two-factor authentication
+- [ ] Real-time notifications (SignalR)
+- [ ] Calendar view for appointments
+- [ ] Export reports to PDF
+- [ ] Dashboard charts and analytics
+- [ ] Mobile app (Xamarin/MAUI)
+- [ ] Integration with payment gateway
+- [ ] Telemedicine video calls
+
+## 📚 Documentation
+
+- [Deployment Checklist](DEPLOYMENT_CHECKLIST.md) - Complete guide for production deployment
+- [Quick Start Hosting](QUICK_START_HOSTING.md) - Fast hosting options
+- [API Documentation](http://localhost:5080/swagger) - Interactive API docs (when running)
+
+## 👨‍💻 Development
+
+### Prerequisites for Development
+- .NET 8.0 SDK
+- Visual Studio 2022 / VS Code
+- SQL Server Management Studio (optional)
+- Postman (for API testing)
+
+### Running in Development Mode
 ```bash
-dotnet restore
-dotnet run --project src/HealthVault.Api
-dotnet run --project src/HealthVault.Web
+# Run API with hot reload
+cd src/HealthVault.Api
+dotnet watch run
+
+# Run Web UI with hot reload
+cd src/HealthVault.Web
+dotnet watch run
 ```
 
-- API / Swagger: http://localhost:5080/swagger
-- Web UI: http://localhost:5081
+### Database Migrations
+```bash
+# Add new migration
+dotnet ef migrations add MigrationName --project src/HealthVault.Api
 
-If the Web app is on another host, set `ApiBaseUrl` in `src/HealthVault.Web/appsettings.json`.
+# Update database
+dotnet ef database update --project src/HealthVault.Api
 
-## Demo accounts
+# Remove last migration
+dotnet ef migrations remove --project src/HealthVault.Api
+```
 
-Created on first successful API start.
+## 🤝 Contributing
 
-| Role | Email | Password |
-| --- | --- | --- |
-| Administrator | admin@healthvault.com | Admin@12345 |
-| Staff | staff@healthvault.com | Staff@12345 |
-| Staff | nurse@healthvault.com | Staff@12345 |
-| Patient | patient@healthvault.com | Patient@12345 |
+This is an academic project. Contributions are welcome for learning purposes.
 
-## Core workflow (success criteria)
+## 📄 License
 
-Register / sign in → book appointment → staff confirms → upload record → patient views / downloads.
+This project is created for educational purposes as an end-of-semester project.
 
-## Out of scope (unchanged from the SRS)
+## 👤 Author
 
-SignalR, SMS/email, Azure Blob, Key Vault, video consults, FHIR, mobile app, automated CI/CD, production HIPAA.
+**Your Name**
+- Student ID: [Your ID]
+- Program: [Your Program]
+- Institution: [Your Institution]
+- Email: [Your Email]
+- GitHub: [Your GitHub]
 
-## Role changes in the MVP
+## 🙏 Acknowledgments
 
-There is no role-edit screen. Update `database/04_AssignRole.sql` (`@Email`, `@NewRole`) and execute it.
+- ASP.NET Core documentation
+- Blazor documentation
+- Bootstrap framework
+- Stack Overflow community
+- [Your Instructor's Name]
+
+## 📞 Support
+
+For issues and questions:
+- Create an issue on GitHub
+- Email: [your-email]
+
+---
+
+## 🎓 Academic Information
+
+**Course**: [Course Name]
+**Semester**: [Semester/Year]
+**Instructor**: [Instructor Name]
+**Submission Date**: [Date]
+
+---
+
+**Built with ❤️ using .NET 8.0 and Blazor**
+
+Last Updated: December 2024

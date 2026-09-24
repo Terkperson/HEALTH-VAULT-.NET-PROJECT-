@@ -1,33 +1,46 @@
 @page "/profile"
 @attribute [Authorize(Roles = UserRoles.Patient)]
 @inject ApiClient Api
+@inject ToastService Toast
 
-<h1 class="page-title">My profile</h1>
-<p class="lede">Keep your contact and emergency details current.</p>
-
-@if (!string.IsNullOrWhiteSpace(message))
-{
-    <div class="alert alert-info">@message</div>
-}
+<div class="page-header">
+    <h1 class="page-title">My profile</h1>
+    <p class="lede">Keep your contact and emergency details current.</p>
+</div>
 
 @if (form is not null)
 {
     <div class="card">
+        <h3>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            Personal Information
+        </h3>
         <PatientForm Model="form" OnSave="Save" />
+    </div>
+}
+else
+{
+    <div class="card">
+        <div class="empty-state">
+            <div style="font-size: 48px; margin-bottom: 16px;">⏳</div>
+            <p>Loading your profile...</p>
+        </div>
     </div>
 }
 
 @code {
     private UpsertPatientRequest? form;
     private Guid id;
-    private string? message;
 
     protected override async Task OnInitializedAsync()
     {
         var result = await Api.GetMyProfileAsync();
         if (!result.Success || result.Data is null)
         {
-            message = result.Message;
+            Toast.ShowError(result.Message ?? "Failed to load profile", "Error");
             return;
         }
         id = result.Data.Id;
@@ -38,7 +51,14 @@
     {
         if (form is null) return;
         var result = await Api.UpdatePatientAsync(id, form);
-        message = result.Message;
+        if (result.Success)
+        {
+            Toast.ShowSuccess("Your profile has been updated successfully", "Profile Updated");
+        }
+        else
+        {
+            Toast.ShowError(result.Message ?? "Failed to update profile", "Error");
+        }
     }
 
     private static UpsertPatientRequest ToForm(PatientDto p) => new()

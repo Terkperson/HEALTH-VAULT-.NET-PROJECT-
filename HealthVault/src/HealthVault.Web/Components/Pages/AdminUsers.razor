@@ -1,42 +1,106 @@
 @page "/admin/users"
 @attribute [Authorize(Roles = UserRoles.Administrator)]
 @inject ApiClient Api
+@inject ToastService Toast
 
-<h1 class="page-title">Users and roles</h1>
-<p class="lede">View only for the MVP. To change a role, run <code>database/04_AssignRole.sql</code> in SSMS.</p>
+<div class="page-header">
+    <h1 class="page-title">Users and roles</h1>
+    <p class="lede">View only for the MVP. To change a role, run <code style="background: rgba(13, 110, 110, 0.1); padding: 2px 6px; border-radius: 4px;">database/04_AssignRole.sql</code> in SSMS.</p>
+</div>
 
 <div class="card">
-    @if (users is null)
+    @if (loading)
     {
-        <p>Loading…</p>
+        <div class="empty-state">
+            <div style="font-size: 48px; margin-bottom: 16px;">⏳</div>
+            <p>Loading users...</p>
+        </div>
+    }
+    else if (users is null || !users.Any())
+    {
+        <div class="empty-state">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 16px; color: var(--muted);">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <h3>No users found</h3>
+        </div>
     }
     else
     {
-        <table class="table">
-            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Active</th><th>Created</th></tr></thead>
-            <tbody>
-            @foreach (var u in users)
-            {
-                <tr>
-                    <td>@u.FullName</td>
-                    <td>@u.Email</td>
-                    <td>@u.Phone</td>
-                    <td>@u.Role</td>
-                    <td>@(u.IsActive ? "Yes" : "No")</td>
-                    <td>@u.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</td>
-                </tr>
-            }
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var u in users)
+                {
+                    <tr>
+                        <td style="font-weight: 600;">@u.FullName</td>
+                        <td><small>@u.Email</small></td>
+                        <td>@u.Phone</td>
+                        <td>
+                            <span class="badge-status" style="@GetRoleBadgeStyle(u.Role)">
+                                @u.Role
+                            </span>
+                        </td>
+                        <td>
+                            @if (u.IsActive)
+                            {
+                                <span style="color: var(--ok); font-weight: 600;">✓ Active</span>
+                            }
+                            else
+                            {
+                                <span style="color: var(--muted);">○ Inactive</span>
+                            }
+                        </td>
+                        <td style="white-space: nowrap;">@u.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+        <div style="padding-top: 12px; border-top: 1px solid rgba(215, 227, 223, 0.4); color: var(--muted); font-size: 14px;">
+            <strong>@users.Count</strong> user@(users.Count == 1 ? "" : "s") registered
+        </div>
     }
 </div>
 
 @code {
     private IReadOnlyList<AdminUserDto>? users;
+    private bool loading = false;
 
     protected override async Task OnInitializedAsync()
     {
+        loading = true;
         var result = await Api.AdminUsersAsync();
-        if (result.Success) users = result.Data;
+        loading = false;
+        
+        if (result.Success) 
+        {
+            users = result.Data;
+        }
+        else
+        {
+            Toast.ShowError(result.Message ?? "Failed to load users", "Error");
+        }
     }
+
+    private static string GetRoleBadgeStyle(string role) => role switch
+    {
+        "Administrator" => "background: linear-gradient(135deg, #be123c, #f43f5e); color: white;",
+        "Staff" => "background: linear-gradient(135deg, #1d4ed8, #3b82f6); color: white;",
+        "Patient" => "background: linear-gradient(135deg, #047857, #10b981); color: white;",
+        _ => "background: #e5e7eb; color: #374151;"
+    };
 }

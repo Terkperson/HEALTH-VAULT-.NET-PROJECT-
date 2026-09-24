@@ -4,14 +4,10 @@
 @inject ApiClient Api
 @inject SessionState Session
 @inject IJSRuntime Js
+@inject ToastService Toast
 
 <h1 class="page-title">Medical records</h1>
 <p class="lede">PDF, JPG, PNG or DOCX up to 10 MB. Category is fixed to General for the MVP.</p>
-
-@if (!string.IsNullOrWhiteSpace(message))
-{
-    <div class="alert alert-info">@message</div>
-}
 
 <div class="card">
     <h3>Upload</h3>
@@ -26,7 +22,16 @@
             <InputFile class="form-control" OnChange="OnFile" accept=".pdf,.jpg,.jpeg,.png,.docx" />
         </div>
         <div class="col-md-1">
-            <button class="btn btn-teal w-100" @onclick="Upload" disabled="@(file is null || busy)">Go</button>
+            <button class="btn btn-teal w-100" @onclick="Upload" disabled="@(file is null || busy)">
+                @if (busy)
+                {
+                    <span>...</span>
+                }
+                else
+                {
+                    <span>Go</span>
+                }
+            </button>
         </div>
     </div>
 </div>
@@ -42,7 +47,6 @@
     private IBrowserFile? file;
     private string title = "Clinical document";
     private string? description;
-    private string? message;
     private bool busy;
     private Guid resolvedPatient;
 
@@ -51,7 +55,7 @@
         resolvedPatient = PatientId != Guid.Empty ? PatientId : Session.PatientId ?? Guid.Empty;
         if (resolvedPatient == Guid.Empty)
         {
-            message = "No patient is selected.";
+            Toast.ShowWarning("No patient is selected", "No Patient");
             return;
         }
         await Reload();
@@ -60,11 +64,24 @@
     private async Task Reload()
     {
         var result = await Api.ListRecordsAsync(resolvedPatient);
-        if (result.Success && result.Data is not null) items = result.Data;
-        else message = result.Message;
+        if (result.Success && result.Data is not null) 
+        {
+            items = result.Data;
+        }
+        else 
+        {
+            Toast.ShowError(result.Message ?? "Failed to load records", "Error");
+        }
     }
 
-    private void OnFile(InputFileChangeEventArgs e) => file = e.File;
+    private void OnFile(InputFileChangeEventArgs e)
+    {
+        file = e.File;
+        if (file is not null)
+        {
+            Toast.ShowInfo($"Selected: {file.Name} ({file.Size / 1024}KB)", "File Selected");
+        }
+    }
 
     private async Task Upload()
     {
@@ -72,9 +89,19 @@
         busy = true;
         var result = await Api.UploadRecordAsync(resolvedPatient, title, description, file);
         busy = false;
-        message = result.Message;
-        file = null;
-        await Reload();
+        
+        if (result.Success)
+        {
+            Toast.ShowSuccess($"{file.Name} uploaded successfully", "Upload Complete");
+            file = null;
+            title = "Clinical document";
+            description = null;
+            await Reload();
+        }
+        else
+        {
+            Toast.ShowError(result.Message ?? "Upload failed", "Upload Failed");
+        }
     }
 
     private async Task Download(MedicalRecordDto record)
@@ -82,12 +109,13 @@
         var (bytes, name, type, error) = await Api.DownloadRecordAsync(record.Id, record.OriginalFileName);
         if (bytes is null)
         {
-            message = error;
+            Toast.ShowError(error ?? "Download failed", "Download Failed");
             return;
         }
         var b64 = Convert.ToBase64String(bytes);
         var safeName = name.Replace("'", string.Empty);
         var script = "(() => { const a=document.createElement('a'); a.href='data:" + type + ";base64," + b64 + "'; a.download='" + safeName + "'; a.click(); })()";
         await Js.InvokeVoidAsync("eval", script);
+        Toast.ShowSuccess($"Downloading {safeName}", "Download Started");
     }
 }

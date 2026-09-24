@@ -9,10 +9,21 @@ builder.WebHost.UseUrls("http://0.0.0.0:5081");
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+// Enable detailed errors in development
+builder.Services.AddServerSideBlazor()
+    .AddCircuitOptions(options =>
+    {
+        if (builder.Environment.IsDevelopment())
+        {
+            options.DetailedErrors = true;
+        }
+    });
+
 builder.Services.AddAuthorizationCore();
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<SessionState>();
 builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthStateProvider>();
+builder.Services.AddScoped<ToastService>();
 
 var apiBase = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5080/";
 builder.Services.AddScoped(sp =>

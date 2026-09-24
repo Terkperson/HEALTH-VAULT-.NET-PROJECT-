@@ -2,62 +2,73 @@
 @inject ApiClient Api
 @inject SessionState Session
 @inject NavigationManager Nav
+@inject ToastService Toast
 
-<div class="auth-wrap card">
-    <h1 class="page-title">Patient registration</h1>
-    <p class="lede">Creates a login and a patient profile in one step.</p>
+<PageTitle>Register - HealthVault</PageTitle>
 
-    @if (!string.IsNullOrWhiteSpace(error))
-    {
-        <div class="alert alert-danger">@error</div>
-    }
+<div class="auth-wrap">
+    <div class="card">
+        <div class="auth-logo">
+            <div class="auth-logo-mark">HV</div>
+            <div class="auth-logo-text">HealthVault</div>
+        </div>
+        
+        <h1 class="auth-form-title">Create Account</h1>
+        <p class="auth-form-subtitle">Register as a patient to get started</p>
 
-    <EditForm Model="model" OnValidSubmit="Submit">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label class="form-label">First name</label>
-                <InputText class="form-control" @bind-Value="model.FirstName" />
+        <EditForm Model="model" OnValidSubmit="Submit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">First name <span style="color: #f43f5e;">*</span></label>
+                    <InputText class="form-control" @bind-Value="model.FirstName" placeholder="John" />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Last name <span style="color: #f43f5e;">*</span></label>
+                    <InputText class="form-control" @bind-Value="model.LastName" placeholder="Doe" />
+                </div>
             </div>
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Last name</label>
-                <InputText class="form-control" @bind-Value="model.LastName" />
+            <div class="mb-3">
+                <label class="form-label">Email <span style="color: #f43f5e;">*</span></label>
+                <InputText class="form-control" @bind-Value="model.Email" placeholder="you@example.com" />
             </div>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Email</label>
-            <InputText class="form-control" @bind-Value="model.Email" />
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Phone</label>
-            <InputText class="form-control" @bind-Value="model.Phone" />
-        </div>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Date of birth</label>
-                <InputDate class="form-control" @bind-Value="model.DateOfBirth" />
+            <div class="mb-3">
+                <label class="form-label">Phone <span style="color: #f43f5e;">*</span></label>
+                <InputText class="form-control" @bind-Value="model.Phone" placeholder="+233 XX XXX XXXX" />
             </div>
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Gender</label>
-                <InputSelect class="form-select" @bind-Value="model.Gender">
-                    <option value="1">Female</option>
-                    <option value="2">Male</option>
-                    <option value="3">Other</option>
-                    <option value="4">Prefer not to say</option>
-                </InputSelect>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Date of birth <span style="color: #f43f5e;">*</span></label>
+                    <InputDate class="form-control" @bind-Value="model.DateOfBirth" />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Gender <span style="color: #f43f5e;">*</span></label>
+                    <InputSelect class="form-select" @bind-Value="model.Gender">
+                        <option value="1">Female</option>
+                        <option value="2">Male</option>
+                        <option value="3">Other</option>
+                        <option value="4">Prefer not to say</option>
+                    </InputSelect>
+                </div>
             </div>
+            <div class="mb-3">
+                <label class="form-label">Password <span style="color: #f43f5e;">*</span></label>
+                <InputText type="password" class="form-control" @bind-Value="model.Password" placeholder="Create a strong password" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Confirm password <span style="color: #f43f5e;">*</span></label>
+                <InputText type="password" class="form-control" @bind-Value="model.ConfirmPassword" placeholder="Re-enter your password" />
+            </div>
+            <button class="btn btn-teal w-100" type="submit" disabled="@busy" style="padding: 12px; font-size: 16px;">
+                @(busy ? "Creating account…" : "Create account")
+            </button>
+        </EditForm>
+        
+        <div class="auth-form-footer">
+            Already have an account? <a href="/login">Sign in</a>
         </div>
-        <div class="mb-3">
-            <label class="form-label">Password</label>
-            <InputText type="password" class="form-control" @bind-Value="model.Password" />
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Confirm password</label>
-            <InputText type="password" class="form-control" @bind-Value="model.ConfirmPassword" />
-        </div>
-        <button class="btn btn-teal w-100" type="submit" disabled="@busy">@(busy ? "Creating…" : "Create account")</button>
-    </EditForm>
+    </div>
 </div>
 
 @code {
@@ -66,22 +77,22 @@
         DateOfBirth = new DateOnly(2000, 1, 1),
         Gender = 4
     };
-    private string? error;
     private bool busy;
 
     private async Task Submit()
     {
         busy = true;
-        error = null;
         var result = await Api.RegisterAsync(model);
         busy = false;
         if (!result.Success || result.Data is null)
         {
-            error = string.Join(" ", result.Errors);
-            if (string.IsNullOrWhiteSpace(error)) error = result.Message;
+            var error = string.Join(" ", result.Errors);
+            if (string.IsNullOrWhiteSpace(error)) error = result.Message ?? "Registration failed";
+            Toast.ShowError(error, "Registration Failed");
             return;
         }
         Session.Set(result.Data);
+        Toast.ShowSuccess("Your account has been created successfully!", "Welcome to HealthVault");
         Nav.NavigateTo("/dashboard");
     }
 }
