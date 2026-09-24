@@ -4,7 +4,8 @@ using Microsoft.AspNetCore.Components.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.UseUrls("http://0.0.0.0:5081");
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5081";
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();

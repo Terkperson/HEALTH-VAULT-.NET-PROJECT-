@@ -313,9 +313,38 @@ dotnet ef migrations add MigrationName --project src/HealthVault.Api
 # Update database
 dotnet ef database update --project src/HealthVault.Api
 
+<<<<<<< HEAD
 # Remove last migration
 dotnet ef migrations remove --project src/HealthVault.Api
 ```
+=======
+## 4. Deploy the API and Web app
+
+This is a separate frontend and backend project, so submit one GitHub link and one deployment link for each app.
+
+For Render, create two Docker web services from the repository root. Leave **Root Directory** empty, set the API service Dockerfile path to `Dockerfile.api`, and set the Web service Dockerfile path to `Dockerfile.web`. The Dockerfiles build the .NET 8 projects from the repository root.
+
+The hosting platform must provide a reachable SQL Server database. Run the database scripts against that database before opening the API URL; the API then creates the demo Identity accounts on first start.
+
+Set these environment variables on the API service:
+
+```
+ConnectionStrings__DefaultConnection=<SQL Server connection string>
+Jwt__Key=<long random production secret>
+Jwt__Issuer=HealthVault
+Jwt__Audience=HealthVault.Clients
+```
+
+Set this environment variable on the Web service, using the public API URL and a trailing slash:
+
+```
+ApiBaseUrl=https://<your-api-domain>/
+```
+
+The apps use the hosting platform's `PORT` variable when it is supplied, and keep ports 5080 and 5081 for local development. Do not commit production connection strings, JWT keys, or real patient data.
+
+## Demo accounts
+>>>>>>> 960b12810b17516b39cef21ad8ba29fcce5b106a
 
 ## 🤝 Contributing
 
