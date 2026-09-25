@@ -1,0 +1,34 @@
+name: Build and Deploy HealthVault API
+
+on:
+  push:
+    branches: [ "main" ]  # Change to "master" if your default branch is master
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore HealthVault/src/HealthVault.Api/HealthVault.Api.csproj
+
+    - name: Build with dotnet
+      run: dotnet build HealthVault/src/HealthVault.Api/HealthVault.Api.csproj --configuration Release --no-restore
+
+    - name: Publish with dotnet
+      run: dotnet publish HealthVault/src/HealthVault.Api/HealthVault.Api.csproj --configuration Release --no-build --output ./myapp
+
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v3
+      with:
+        app-name: 'healthvault-api-app'
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        package: './myapp'
