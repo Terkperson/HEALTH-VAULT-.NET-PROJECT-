@@ -73,7 +73,12 @@ builder.Services.AddCors(options =>
     options.AddPolicy("Client", policy =>
         policy.AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowAnyOrigin());
+              .WithOrigins(
+                  "https://healthvault-web-app-hgd5bwc4e8e5dkf8.ukwest-01.azurewebsites.net",
+                  "http://localhost:5081",
+                  "https://localhost:5081"
+              )
+              .AllowCredentials());
 });
 
 var app = builder.Build();
