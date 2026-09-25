@@ -26,7 +26,8 @@ builder.Services.AddScoped<SessionState>();
 builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthStateProvider>();
 builder.Services.AddScoped<ToastService>();
 
-var apiBase = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5080/";
+// Updated fallback to point to your Azure backend API
+var apiBase = builder.Configuration["ApiBaseUrl"] ?? "https://healthvault-api-app-h3hkd3bcf4exh2bz.ukwest-01.azurewebsites.net/";
 builder.Services.AddScoped(sp =>
 {
     var client = new HttpClient { BaseAddress = new Uri(apiBase) };
