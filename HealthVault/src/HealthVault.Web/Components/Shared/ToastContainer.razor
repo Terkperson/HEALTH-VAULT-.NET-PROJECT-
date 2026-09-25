@@ -2,7 +2,7 @@
 @inject ToastService ToastService
 
 <div class="toast-container">
-    @foreach (var toast in toasts)
+    @foreach (var toast in toasts.ToList())
     {
         <div class="toast-item toast-@toast.Type.ToString().ToLower() @(toast.IsRemoving ? "removing" : "")" 
              @key="toast.Id">
