@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore HealthVault/HealthVault.sln
+
+      - name: Build
+        run: dotnet build HealthVault/HealthVault.sln --configuration Release --no-restore

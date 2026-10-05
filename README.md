@@ -40,6 +40,18 @@ dotnet restore
 dotnet build
 ```
 
+### Verify changes
+
+From the repository root, build the full solution before opening a pull request:
+
+```bash
+dotnet build HealthVault/HealthVault.sln --configuration Release
+```
+
+There are currently no automated test projects in the solution, so `dotnet test`
+does not yet provide project-specific test coverage. The CI workflow builds the
+solution on pull requests targeting `main`.
+
 ### Run the API
 
 ```bash
@@ -72,6 +84,11 @@ HEALTH-VAULT-.NET-PROJECT-
 ```
 
 ## Configuration notes
+
+The API and web app may require local configuration, including a database
+connection string and authentication settings. Configure these through local
+user secrets or environment variables; do not commit credentials. See the
+project setup and deployment guides below for environment-specific details.
 
 The project includes Azure deployment and environment configuration guidance in the repository root docs:
 
