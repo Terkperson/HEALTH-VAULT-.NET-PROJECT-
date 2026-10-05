@@ -68,16 +68,21 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddAuthorization();
+
+const string ClientCorsPolicy = "Client";
+string[] clientOrigins =
+[
+    "https://healthvault-web-app-hgd5bwc4e8e5dkf8.ukwest-01.azurewebsites.net",
+    "http://localhost:5081",
+    "https://localhost:5081"
+];
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("Client", policy =>
+    options.AddPolicy(ClientCorsPolicy, policy =>
         policy.AllowAnyHeader()
               .AllowAnyMethod()
-              .WithOrigins(
-                  "https://healthvault-web-app-hgd5bwc4e8e5dkf8.ukwest-01.azurewebsites.net",
-                  "http://localhost:5081",
-                  "https://localhost:5081"
-              )
+              .WithOrigins(clientOrigins)
               .AllowCredentials());
 });
 
@@ -94,7 +99,7 @@ using (var scope = app.Services.CreateScope())
 
 app.UseSwagger();
 app.UseSwaggerUI();
-app.UseCors("Client");
+app.UseCors(ClientCorsPolicy);
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

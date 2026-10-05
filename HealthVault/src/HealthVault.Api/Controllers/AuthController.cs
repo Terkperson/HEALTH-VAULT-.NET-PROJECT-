@@ -7,20 +7,13 @@ namespace HealthVault.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController : ControllerBase
+public class AuthController(IAuthService auth) : ControllerBase
 {
-    private readonly IAuthService _auth;
-
-    public AuthController(IAuthService auth)
-    {
-        _auth = auth;
-    }
-
     [HttpPost("register")]
     [AllowAnonymous]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken ct)
     {
-        var result = await _auth.RegisterAsync(request, ct);
+        var result = await auth.RegisterAsync(request, ct);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
@@ -28,7 +21,7 @@ public class AuthController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken ct)
     {
-        var result = await _auth.LoginAsync(request, ct);
+        var result = await auth.LoginAsync(request, ct);
         return result.Success ? Ok(result) : Unauthorized(result);
     }
 }
